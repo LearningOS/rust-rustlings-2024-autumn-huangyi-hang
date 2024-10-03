@@ -8,7 +8,7 @@ use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
 use std::vec::*;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Node<T> {
     val: T,
     next: Option<NonNull<Node<T>>>,
@@ -29,13 +29,13 @@ struct LinkedList<T> {
     end: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Default for LinkedList<T> {
+impl<T: PartialOrd + Clone> Default for LinkedList<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T> LinkedList<T> {
+impl<T: PartialOrd + Clone> LinkedList<T> {
     pub fn new() -> Self {
         Self {
             length: 0,
@@ -71,12 +71,45 @@ impl<T> LinkedList<T> {
     }
 	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
 	{
-		//TODO
-		Self {
+        let mut merged_list = LinkedList {
             length: 0,
             start: None,
-            end: None,
+            end: None
+        };
+        let mut la = list_a.start;
+        let mut lb = list_b.start;
+        unsafe {
+            while la.is_some() || lb.is_some() {
+                match (la, lb) {
+                    (Some(la_ptr), Some(lb_ptr)) => {
+                        let la_v = (*la_ptr.as_ptr()).val.clone();
+                        let lb_v = (*lb_ptr.as_ptr()).val.clone();
+                        if la_v < lb_v {
+                            merged_list.add(la_v);
+                            la = (*la_ptr.as_ptr()).next;
+                        } else {
+                            merged_list.add(lb_v);
+                            lb = (*lb_ptr.as_ptr()).next;
+                        }
+                    }
+
+                    (None, Some(lb_ptr)) => {
+                        let lb_v = (*lb_ptr.as_ptr()).val.clone();
+                        merged_list.add(lb_v);
+                        lb = (*lb_ptr.as_ptr()).next;
+                    }
+                    (Some(la_ptr), None) => {
+                        let la_v = (*la_ptr.as_ptr()).val.clone();
+                        merged_list.add(la_v);
+                        la = (*la_ptr.as_ptr()).next;
+                    }
+                    _ => break,
+                    
+                }
+            }
         }
+        merged_list
+
 	}
 }
 
