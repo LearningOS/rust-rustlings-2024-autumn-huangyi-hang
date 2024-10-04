@@ -55,6 +55,7 @@ impl<T> Default for Queue<T> {
 pub struct myStack<T>
 {
 	//TODO
+    len: usize,
 	q1:Queue<T>,
 	q2:Queue<T>
 }
@@ -62,28 +63,68 @@ impl<T> myStack<T> {
     pub fn new() -> Self {
         Self {
 			//TODO
+            len:0, 
 			q1:Queue::<T>::new(),
 			q2:Queue::<T>::new()
         }
     }
     pub fn push(&mut self, elem: T) {
-        //TODO
+        self.q1.enqueue(elem);
+        self.len += 1;
     }
     pub fn pop(&mut self) -> Result<T, &str> {
         //TODO
-		Err("Stack is empty")
+        if self.is_empty() {
+            return Err("Stack is empty");
+        } 
+        assert!(self.q2.is_empty());
+        while self.q1.size() > 1 {
+            if let Ok(val) = self.q1.dequeue() {
+                self.q2.enqueue(val);
+            }
+        }
+        //assert_eq!(self.len, 2);
+        let top_elem = self.q1.dequeue().unwrap();
+        std::mem::swap(&mut self.q1, &mut self.q2);
+        assert!(self.q2.is_empty());
+        self.len -= 1;
+        return Ok(top_elem);
     }
     pub fn is_empty(&self) -> bool {
-		//TODO
-        true
+        self.len == 0
     }
 }
 
 #[cfg(test)]
 mod tests {
 	use super::*;
+
+    #[test]
+    fn test_with_empty() {
+        let mut s = myStack::<i32>::new();
+		assert_eq!(s.pop(), Err("Stack is empty"));
+    }
+    #[test]
+    fn test_with_one() {
+        let mut s = myStack::<i32>::new();
+		assert_eq!(s.pop(), Err("Stack is empty"));
+        s.push(1);
+        assert_eq!(s.pop(), Ok(1));
+    }
+    #[test]
+    fn test_with_two() {
+        let mut s = myStack::<i32>::new();
+		assert_eq!(s.pop(), Err("Stack is empty"));
+        s.push(1);
+        s.push(2);
+        assert_eq!(s.len, 2);
+        assert_eq!(s.pop(), Ok(2));
+        assert_eq!(s.pop(), Ok(1));
+    }
+
+
 	
-	#[test]
+    #[test]
 	fn test_queue(){
 		let mut s = myStack::<i32>::new();
 		assert_eq!(s.pop(), Err("Stack is empty"));

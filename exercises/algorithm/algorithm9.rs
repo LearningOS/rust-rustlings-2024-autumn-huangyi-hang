@@ -37,7 +37,19 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        // todo, add a element contained
+        self.items.push(value);
+        self.count += 1;
+        let mut index = self.count;
+        while  index > 1 {
+            let p_idx = self.parent_idx(index);
+            if (self.comparator)(self.items.get(index).unwrap(), self.items.get(p_idx).unwrap()) {
+                self.items.swap(index, p_idx);
+                index = p_idx;
+            } else {
+                break;
+            }
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -84,8 +96,28 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        if self.count == 0 {
+            return None;
+        } else {
+            self.items.swap(1, self.count);
+            let ret = self.items.pop();
+            self.count -= 1;
+            let mut index = 1;
+            while index < self.count {
+                let left_idx = self.left_child_idx(index);
+                let right_idx = self.right_child_idx(index);
+                if left_idx < self.count && !(self.comparator)(self.items.get(index).unwrap(), self.items.get(left_idx).unwrap()) {
+                    self.items.swap(index, left_idx);
+                    index = left_idx;
+                } else if right_idx < self.count && !((self.comparator)(self.items.get(index).unwrap(), self.items.get(right_idx).unwrap())) {
+                    self.items.swap(index, right_idx);
+                    index = right_idx;
+                } else {
+                    break;
+                }
+            }
+            return ret;
+        }
     }
 }
 
@@ -113,6 +145,7 @@ impl MaxHeap {
     }
 }
 
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -120,6 +153,13 @@ mod tests {
     fn test_empty_heap() {
         let mut heap = MaxHeap::new::<i32>();
         assert_eq!(heap.next(), None);
+    }
+
+    #[test]
+    fn test_min_with_one() {
+        let mut heap = MinHeap::new();
+        heap.add(4);
+        heap.add(2);
     }
 
     #[test]
