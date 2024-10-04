@@ -2,10 +2,9 @@
 	graph
 	This problem requires you to implement a basic graph functio
 */
-// I AM NOT DONE
 
 use std::collections::{HashMap, HashSet};
-use std::fmt;
+use std::{fmt, vec};
 #[derive(Debug, Clone)]
 pub struct NodeNotInGraph;
 impl fmt::Display for NodeNotInGraph {
@@ -29,8 +28,16 @@ impl Graph for UndirectedGraph {
         &self.adjacency_table
     }
     fn add_edge(&mut self, edge: (&str, &str, i32)) {
-        //TODO
+        self.adjacency_table_mutable().entry(edge.0.to_string())
+        .and_modify(|v| v.push((edge.1.to_string(), edge.2)))
+        .or_insert(vec![(edge.1.to_string(), edge.2)]);
+
+
+        self.adjacency_table_mutable().entry(edge.1.to_string())
+        .and_modify(|v| v.push((edge.0.to_string(), edge.2)))
+        .or_insert(vec![(edge.0.to_string(), edge.2)]);
     }
+
 }
 pub trait Graph {
     fn new() -> Self;
@@ -38,10 +45,16 @@ pub trait Graph {
     fn adjacency_table(&self) -> &HashMap<String, Vec<(String, i32)>>;
     fn add_node(&mut self, node: &str) -> bool {
         //TODO
+        //let mut adj_tab = self.adjacency_table_mutable();
+        //if !adj_tab.contains_key(node) {
+        //    adj_tab.insert(node.to_string(), vec![]);
+        //}
 		true
     }
     fn add_edge(&mut self, edge: (&str, &str, i32)) {
-        //TODO
+        //let mut adj_tab = self.adjacency_table_mutable();
+        //adj_tab.insert(edge.0.to_string(), vec![(edge.1.to_string(), edge.2)]);
+        //adj_tab.insert(edge.1.to_string(), vec![(edge.0.to_string(), edge.2)]);
     }
     fn contains(&self, node: &str) -> bool {
         self.adjacency_table().get(node).is_some()
