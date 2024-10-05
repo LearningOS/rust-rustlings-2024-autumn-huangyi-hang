@@ -27,7 +27,6 @@ enum IntoColorError {
     IntConversion,
 }
 
-// I AM NOT DONE
 
 // Your task is to complete this implementation and return an Ok result of inner
 // type Color. You need to create an implementation for a tuple of three
@@ -41,13 +40,49 @@ enum IntoColorError {
 impl TryFrom<(i16, i16, i16)> for Color {
     type Error = IntoColorError;
     fn try_from(tuple: (i16, i16, i16)) -> Result<Self, Self::Error> {
+        match tuple {
+            (r, g, b) => {
+                if is_valid_value(r, g, b) {
+                    Ok(
+                        Color {
+                            red: r as u8,
+                            green: g as u8,
+                            blue: b as u8,
+                        }
+                    )
+                } else {
+                    return Err(IntoColorError::IntConversion)
+                }
+            }
+            _ => return Err(IntoColorError::BadLen)
+
+        }
     }
 }
 
+fn is_valid_value(r: i16, g: i16, b: i16) -> bool {
+    return (0<= r) && (r <= 255) &&(0<= g) && (g <= 255) && (0<= b) && (b <= 255)
+}
 // Array implementation
 impl TryFrom<[i16; 3]> for Color {
     type Error = IntoColorError;
     fn try_from(arr: [i16; 3]) -> Result<Self, Self::Error> {
+        if arr.len() != 3 {
+            Err(IntoColorError::BadLen)
+        } else {
+            let [r, g, b] = arr;
+            if is_valid_value(r, g, b) {
+                Ok(
+                    Color {
+                        red: r as u8,
+                        green: g as u8,
+                        blue: b as u8,
+                    }
+                )
+            } else {
+                Err(IntoColorError::IntConversion)
+            }
+        }
     }
 }
 
@@ -55,6 +90,21 @@ impl TryFrom<[i16; 3]> for Color {
 impl TryFrom<&[i16]> for Color {
     type Error = IntoColorError;
     fn try_from(slice: &[i16]) -> Result<Self, Self::Error> {
+        if slice.len() != 3 {
+            Err(IntoColorError::BadLen)
+        } else {
+            //let [r, g, b] = slice;
+            let r = slice[0];
+            let g = slice[1];
+            let b = slice[2];
+            if is_valid_value(r, g, b) {
+                Ok(
+                    Color { red: r as u8, green: g as u8, blue: b as u8 }
+                )
+            } else {
+                Err(IntoColorError::IntConversion)
+            }
+        }
     }
 }
 

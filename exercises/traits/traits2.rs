@@ -14,10 +14,10 @@ trait AppendBar {
 }
 
 // TODO: Implement trait `AppendBar` for a vector of strings.
-impl<String> AppendBar for Vec<Stirng> {
+impl AppendBar for Vec<String> {
     fn append_bar(self) -> Self {
         let mut v = self;
-        v.push("Bar");
+        v.push(String::from("Bar"));
         v
     }
     
